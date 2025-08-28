@@ -1,0 +1,82 @@
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+#include <stdlib.h>
+
+typedef struct{
+    int type;
+    char *str;
+}Operation;
+
+int main() {
+
+    /* Enter your code here. Read input from STDIN. Print output to STDOUT */
+    int Q;
+    if(scanf("%d", &Q) != 1) return 0;
+    
+    char *S = malloc(1000005 * sizeof(char));
+    int len = 0;
+    S[0] = '\0';
+    
+    Operation *history = malloc(Q * sizeof(Operation));
+    int hist_top = -1;
+    
+    for(int i = 0; i < Q; i++){
+        int t;
+        scanf("%d", &t);
+        
+        if(t == 1){
+            char W[1000001];
+            scanf("%s", W);
+            int wlen = strlen(W);
+            
+            hist_top++;
+            history[hist_top].type = 1;
+            history[hist_top].str = strdup(W);
+            
+            memcpy(S + len, W, wlen + 1);
+            len += wlen;
+        } else if(t == 2){
+            int k;
+            scanf("%d", &k);
+            
+            hist_top++;
+            history[hist_top].type = 2;
+            history[hist_top].str = malloc((k+1) * sizeof(char));
+            
+            memcpy(history[hist_top].str, S + len - k, k);
+            history[hist_top].str[k] = '\0';
+            
+            len -= k;
+            S[len] = '\0';
+        } else if(t == 3){
+            int k;
+            scanf("%d", &k);
+            if(k > 0 && k <= len){
+                printf("%c\n", S[k-1]);
+            }
+        } else if(t == 4){
+            if(hist_top >= 0){
+                Operation op = history[hist_top--];
+                if(op.type == 1){
+                    int wlen = strlen(op.str);
+                    len -= wlen;
+                    S[len] = '\0';
+                } else if(op.type == 2){
+                    int slen = strlen(op.str);
+                    memcpy(S + len, op.str, slen + 1);
+                    len += slen;
+                }
+                free(op.str);
+            }
+        }
+    }
+        
+    for(int i = 0; i <= hist_top; i++){
+        free(history[i].str);
+    }
+    free(history);
+    free(S);
+       
+    return 0;
+}
